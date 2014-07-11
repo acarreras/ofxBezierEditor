@@ -2,6 +2,9 @@ ofxBezierEditor
 ===============
 
 An easy bézier shapes editor tool. Load, edit, save and draw bézier shapes in your Openframeworks aplication
+![example1-ui](example1.png)
+![example2-ui](example2.png)
+![example3-ui-edit](example3.png)
 
 Use
 -------

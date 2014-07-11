@@ -52,11 +52,22 @@ class ofxBezierEditor{
 
 		void setColorFill(ofColor c){ colorFill = c; };
 		void setColorFill(float r, float g, float b){ colorFill.set(r,g,b); };
+		void setColorFillR(float c){ colorFill.r = c; };
+		void setColorFillG(float c){ colorFill.g = c; };
+		void setColorFillB(float c){ colorFill.b = c; };
 		void setColorStroke(ofColor c){ colorStroke = c; };
 		void setColorStroke(float r, float g, float b){ colorStroke.set(r,g,b); };
+		void setColorStrokeR(float c){ colorStroke.r = c; };
+		void setColorStrokeG(float c){ colorStroke.g = c; };
+		void setColorStrokeB(float c){ colorStroke.b = c; };
 
 		int getStrokeWeight(){ return strokeWeight; };
 		void setStrokeWeight(int w){ strokeWeight = w; };
+
+		float getTranslateX(){ return translateX; };
+		void setTranslateX(float t){ translateX = t; };
+		float getTranslateY(){ return translateY; };
+		void setTranslateY(float t){ translateY = t; };
 
 	private:
         int currentPointToMove;
@@ -78,4 +89,6 @@ class ofxBezierEditor{
 
 		float translateX, translateY;
 		float mouseX, mouseY;
+
+		bool beditBezier;
 };

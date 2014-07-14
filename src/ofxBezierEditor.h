@@ -51,15 +51,17 @@ class ofxBezierEditor{
 		void setFillBezier(bool b){ bfillBezier = b; };
 
 		void setColorFill(ofColor c){ colorFill = c; };
-		void setColorFill(float r, float g, float b){ colorFill.set(r,g,b); };
+		void setColorFill(float r, float g, float b, float a=255.0){ colorFill.set(r,g,b,a); };
 		void setColorFillR(float c){ colorFill.r = c; };
 		void setColorFillG(float c){ colorFill.g = c; };
 		void setColorFillB(float c){ colorFill.b = c; };
+		void setColorFillA(float a){ colorFill.a = a; };
 		void setColorStroke(ofColor c){ colorStroke = c; };
-		void setColorStroke(float r, float g, float b){ colorStroke.set(r,g,b); };
+		void setColorStroke(float r, float g, float b, float a=255.0){ colorStroke.set(r,g,b,a); };
 		void setColorStrokeR(float c){ colorStroke.r = c; };
 		void setColorStrokeG(float c){ colorStroke.g = c; };
 		void setColorStrokeB(float c){ colorStroke.b = c; };
+		void setColorStrokeA(float a){ colorStroke.a = a; };
 
 		int getStrokeWeight(){ return strokeWeight; };
 		void setStrokeWeight(int w){ strokeWeight = w; };

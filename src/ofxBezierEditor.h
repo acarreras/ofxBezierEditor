@@ -22,6 +22,8 @@ class ofxBezierEditor{
         vector <draggableVertex> curveVertices;
 		vector <draggableVertex> controlPoint1;
 		vector <draggableVertex> controlPoint2;
+		ofPolyline polyLineFromPoints;
+		void createPolyLineFromPoints();
 
 		void loadXmlPoints();
 		void saveXmlPoints();
@@ -71,6 +73,8 @@ class ofxBezierEditor{
 		float getTranslateY(){ return translateY; };
 		void setTranslateY(float t){ translateY = t; };
 
+		ofPoint getCenter(){ return center; };
+
 	private:
         int currentPointToMove;
 		int lastVertexSelected;
@@ -88,6 +92,9 @@ class ofxBezierEditor{
 		ofRectangle boundingBox;
 		void updateBoundingBox();
 		bool bshowBoundingBox;
+
+		ofPoint center;
+        void calculateCenter();
 
 		float translateX, translateY;
 		float mouseX, mouseY;

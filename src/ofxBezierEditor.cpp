@@ -1,5 +1,28 @@
 #include "ofxBezierEditor.h"
 
+//--------------------------------------------------------------
+void drawWithNormals(const ofPolyline& polyline) {
+	for(int i=0; i< (int) polyline.size(); i++ ) {
+		bool repeatNext = i == (int)polyline.size() - 1;
+
+		const ofPoint& cur = polyline[i];
+		const ofPoint& next = repeatNext ? polyline[0] : polyline[i + 1];
+
+		float angle = atan2f(next.y - cur.y, next.x - cur.x) * RAD_TO_DEG;
+		float distance = cur.distance(next);
+
+		if(repeatNext) {
+			ofSetColor(255, 0, 255);
+		}
+		glPushMatrix();
+		glTranslatef(cur.x, cur.y, 0);
+		ofRotate(angle);
+		ofLine(0, 0, 0, distance); // normals
+		ofLine(0, 0, distance, 0);
+		glPopMatrix();
+	}
+}
+
 ofxBezierEditor::~ofxBezierEditor(){
     ofUnregisterMouseEvents(this);
     ofUnregisterKeyEvents(this);
@@ -24,6 +47,7 @@ ofxBezierEditor::ofxBezierEditor(){
 
 	boundingBox.set(0,0,0,0);
 	bshowBoundingBox = false;
+    center.set(0,0);
 
 	beditBezier = true;
 
@@ -86,6 +110,7 @@ void ofxBezierEditor::loadXmlPoints(){
 	}
 
 	updateBoundingBox();
+	calculateCenter();
 }
 
 //--------------------------------------------------------------
@@ -283,6 +308,12 @@ void ofxBezierEditor::drawHelp(){
             ofRect(boundingBox);
         }
         ofPopMatrix();
+
+        // polyline
+        ofNoFill();
+        ofSetLineWidth(1);
+        ofSetColor(0, 200, 200, 255);
+        drawWithNormals(polyLineFromPoints);
     } // end of if(curveVertices.size() > 0){
 
     ofSetColor(0,0,0,80);
@@ -302,6 +333,7 @@ void ofxBezierEditor::drawHelp(){
     ofDrawBitmapString("drag bounding box to move all the bezier", 20,300);
     ofDrawBitmapString("COLORS:\nfill " + ofToString((float)colorFill.r) + "(r) " + ofToString((float)colorFill.g) + "(g) " + ofToString((float)colorFill.b) + "(b)" +
                         "\nstroke " + ofToString((float)colorStroke.r) + "(r) " + ofToString((float)colorStroke.g) + "(g) " + ofToString((float)colorStroke.b) + "(b)", 20,320);
+    ofDrawBitmapString("[p] create polyline", 20,360);
 
     ofDisableAlphaBlending();
 }
@@ -443,6 +475,9 @@ void ofxBezierEditor::mousePressed(ofMouseEventArgs &args){
                     cp.x = ofLerp(curveVertices.at(0).x - translateX, curveVertices.at(nEnd).x - translateX, 0.33);
                     cp.y = ofLerp(curveVertices.at(0).y - translateY, curveVertices.at(nEnd).y - translateY, 0.33);
                     controlPoint2.push_back(cp);
+
+                    updateBoundingBox();
+                    calculateCenter();
                 }
             } // end else bshowBoundingBox = false
         }
@@ -488,6 +523,9 @@ void ofxBezierEditor::mousePressed(ofMouseEventArgs &args){
                     cp.x = ofLerp(curveVertices.at(lastVertexSelected).x - translateX, curveVertices.at(lastVertexSelected).x - translateX, 0.33);
                     cp.y = ofLerp(curveVertices.at(lastVertexSelected-1).y - translateY, curveVertices.at(lastVertexSelected).y - translateY, 0.33);
                     controlPoint2.insert(controlPoint2.begin()+lastVertexSelected,cp);
+
+                    updateBoundingBox();
+                    calculateCenter();
                 }
             }
         }
@@ -520,6 +558,9 @@ void ofxBezierEditor::keyPressed(ofKeyEventArgs &args){
         }
         else if(args.key == 'l'){
             loadXmlPoints();
+        }
+        else if(args.key == 'p'){
+            createPolyLineFromPoints();
         }
         else if(args.key == 'f'){
             bfillBezier = !bfillBezier;
@@ -602,12 +643,18 @@ void ofxBezierEditor::keyPressed(ofKeyEventArgs &args){
             curveVertices.pop_back();
             controlPoint1.pop_back();
             controlPoint2.pop_back();
+
+            updateBoundingBox();
+            calculateCenter();
         }
         if(args.key == OF_KEY_DEL){
             // REMOVE last intermediate vertex added
             curveVertices.erase(curveVertices.begin()+lastVertexSelected);
             controlPoint1.erase(controlPoint1.begin()+lastVertexSelected);
             controlPoint2.erase(controlPoint2.begin()+lastVertexSelected);
+
+            updateBoundingBox();
+            calculateCenter();
         }
     }
 }
@@ -638,4 +685,25 @@ void ofxBezierEditor::updateBoundingBox(){
         }
     }
     boundingBox.set(minx, miny, maxx-minx, maxy-miny);
+}
+
+//--------------------------------------------------------------
+void ofxBezierEditor::calculateCenter(){
+    center.set(boundingBox.x + 0.5f*boundingBox.width, boundingBox.y + 0.5f*boundingBox.height);
+}
+
+//--------------------------------------------------------------
+void ofxBezierEditor::createPolyLineFromPoints(){
+    if(curveVertices.size() > 0){
+        for (int i = 0; i < curveVertices.size(); i++){
+           if (i == 0){
+                polyLineFromPoints.addVertex(curveVertices.at(0).x, curveVertices.at(0).y); // we need to duplicate 0 for the curve to start at point 0
+           }
+           else{
+                polyLineFromPoints.bezierTo(controlPoint1.at(i).x, controlPoint1.at(i).y, controlPoint2.at(i).x, controlPoint2.at(i).y, curveVertices.at(i).x, curveVertices.at(i).y);
+            }
+        }
+        polyLineFromPoints.bezierTo(controlPoint1.at(0).x, controlPoint1.at(0).y, controlPoint2.at(0).x, controlPoint2.at(0).y, curveVertices.at(0).x, curveVertices.at(0).y);
+        polyLineFromPoints.setClosed(true);
+    }
 }

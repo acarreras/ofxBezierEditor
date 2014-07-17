@@ -155,8 +155,7 @@ void ofxBezierEditor::saveXmlPoints(){
 
 //--------------------------------------------------------------
 void ofxBezierEditor::draw(){
-    ofBackground(255);
-	ofEnableAlphaBlending();
+    ofEnableAlphaBlending();
 
     if(curveVertices.size() > 0){
         ofPushMatrix();
@@ -195,7 +194,6 @@ void ofxBezierEditor::draw(){
     } // end of if(curveVertices.size() > 0){
 
     ofDisableAlphaBlending();
-
 }
 
 //--------------------------------------------------------------

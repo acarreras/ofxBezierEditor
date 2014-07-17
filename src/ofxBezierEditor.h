@@ -25,8 +25,9 @@ class ofxBezierEditor{
 		ofPolyline polyLineFromPoints;
 		void createPolyLineFromPoints();
 
-		void loadXmlPoints();
-		void saveXmlPoints();
+        string xmlFilename;
+		void loadXmlPoints(string filename);
+		void saveXmlPoints(string filename);
 
 		int getCurrentPointToMove(){ return currentPointToMove; };
 		void setCurrentPointToMove(int p){ currentPointToMove = p; };

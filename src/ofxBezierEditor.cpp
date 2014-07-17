@@ -53,20 +53,23 @@ ofxBezierEditor::ofxBezierEditor(){
 
 	translateX = translateY = 0;
 
+	xmlFilename = "ofxBezierInfo.xml";
+
 	ofRegisterMouseEvents(this);
 	ofRegisterKeyEvents(this);
 }
 
 //--------------------------------------------------------------
-void ofxBezierEditor::loadXmlPoints(){
-    XMLbezier.loadFile("ofxBezierInfo.xml");
+void ofxBezierEditor::loadXmlPoints(string filename){
+    xmlFilename = filename;
+    XMLbezier.loadFile(xmlFilename);
     curveVertices.clear();
     controlPoint1.clear();
     controlPoint2.clear();
 
     bfillBezier = XMLbezier.getValue("bezier:fill", true);
-	colorFill.set(XMLbezier.getValue("bezier:colorFill:r", 200), XMLbezier.getValue("bezier:colorFill:g", 200), XMLbezier.getValue("bezier:colorFill:b", 200));
-	colorStroke.set(XMLbezier.getValue("bezier:colorStroke:r", 100), XMLbezier.getValue("bezier:colorStroke:g", 100), XMLbezier.getValue("bezier:colorStroke:b", 100));
+	colorFill.set(XMLbezier.getValue("bezier:colorFill:r", 200), XMLbezier.getValue("bezier:colorFill:g", 200), XMLbezier.getValue("bezier:colorFill:b", 200), XMLbezier.getValue("bezier:colorFill:a", 200));
+	colorStroke.set(XMLbezier.getValue("bezier:colorStroke:r", 100), XMLbezier.getValue("bezier:colorStroke:g", 100), XMLbezier.getValue("bezier:colorStroke:b", 100), XMLbezier.getValue("bezier:colorStroke:a", 200));
 	strokeWeight = XMLbezier.getValue("bezier:strokeWeight", 1);
 
 	int nCurveVertices = XMLbezier.getNumTags("vertex");
@@ -114,7 +117,7 @@ void ofxBezierEditor::loadXmlPoints(){
 }
 
 //--------------------------------------------------------------
-void ofxBezierEditor::saveXmlPoints(){
+void ofxBezierEditor::saveXmlPoints(string filename){
     XMLbezier.clear();
 
     XMLbezier.addTag("bezier");
@@ -122,9 +125,11 @@ void ofxBezierEditor::saveXmlPoints(){
 	XMLbezier.setValue("bezier:colorFill:r", colorFill.r);
 	XMLbezier.setValue("bezier:colorFill:g", colorFill.g);
 	XMLbezier.setValue("bezier:colorFill:b", colorFill.b);
+	XMLbezier.setValue("bezier:colorFill:a", colorFill.a);
 	XMLbezier.setValue("bezier:colorStroke:r", colorStroke.r);
 	XMLbezier.setValue("bezier:colorStroke:g", colorStroke.g);
 	XMLbezier.setValue("bezier:colorStroke:b", colorStroke.b);
+	XMLbezier.setValue("bezier:colorStroke:a", colorStroke.a);
 	XMLbezier.setValue("bezier:strokeWeight", strokeWeight);
 
     for(int i=0; i<curveVertices.size(); i++){
@@ -149,7 +154,7 @@ void ofxBezierEditor::saveXmlPoints(){
 		XMLbezier.popTag();
     }
 
-    XMLbezier.saveFile("ofxBezierInfo.xml");
+    XMLbezier.saveFile(filename);
 
 }
 
@@ -552,10 +557,10 @@ void ofxBezierEditor::keyPressed(ofKeyEventArgs &args){
     }
     if(beditBezier){
         if(args.key == 's'){
-            saveXmlPoints();
+            saveXmlPoints(xmlFilename);
         }
         else if(args.key == 'l'){
-            loadXmlPoints();
+            loadXmlPoints(xmlFilename);
         }
         else if(args.key == 'p'){
             createPolyLineFromPoints();

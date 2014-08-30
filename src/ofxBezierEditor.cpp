@@ -24,8 +24,7 @@ void drawWithNormals(const ofPolyline& polyline) {
 }
 
 ofxBezierEditor::~ofxBezierEditor(){
-    ofUnregisterMouseEvents(this);
-    ofUnregisterKeyEvents(this);
+    setReactToMouseAndKeyEvents(false);
 }
 
 ofxBezierEditor::ofxBezierEditor(){
@@ -49,16 +48,26 @@ ofxBezierEditor::ofxBezierEditor(){
 	bshowBoundingBox = false;
     center.set(0,0);
 
-	beditBezier = true;
+	beditBezier = false;
 
 	translateX = translateY = 0;
 
 	xmlFilename = "ofxBezierInfo.xml";
 
-	ofRegisterMouseEvents(this);
-	ofRegisterKeyEvents(this);
+	setReactToMouseAndKeyEvents(true);
 }
 
+//--------------------------------------------------------------
+void ofxBezierEditor::setReactToMouseAndKeyEvents(bool b){
+    if(b == true){
+        ofRegisterMouseEvents(this);
+        ofRegisterKeyEvents(this);
+    }
+    else{
+        ofUnregisterMouseEvents(this);
+        ofUnregisterKeyEvents(this);
+    }
+}
 //--------------------------------------------------------------
 void ofxBezierEditor::loadXmlPoints(string filename){
     xmlFilename = filename;
@@ -181,6 +190,31 @@ void ofxBezierEditor::draw(){
             ofEndShape(true);
         }
 
+        ofSetLineWidth(strokeWeight);
+        ofSetColor(colorStroke);
+        ofNoFill();
+        ofBeginShape();
+        for (int i = 0; i < curveVertices.size(); i++){
+            if (i == 0){
+                ofVertex(curveVertices.at(0).x, curveVertices.at(0).y); // we need to duplicate 0 for the curve to start at point 0
+                }
+            else {
+                ofBezierVertex(controlPoint1.at(i).x, controlPoint1.at(i).y, controlPoint2.at(i).x, controlPoint2.at(i).y, curveVertices.at(i).x, curveVertices.at(i).y);
+            }
+        }
+        ofBezierVertex(controlPoint1.at(0).x, controlPoint1.at(0).y, controlPoint2.at(0).x, controlPoint2.at(0).y, curveVertices.at(0).x, curveVertices.at(0).y);
+        ofEndShape(true);
+        ofPopMatrix();
+    } // end of if(curveVertices.size() > 0){
+
+    ofDisableAlphaBlending();
+}
+
+//--------------------------------------------------------------
+void ofxBezierEditor::drawOutline(){
+    ofEnableAlphaBlending();
+
+    if(curveVertices.size() > 0){
         ofSetLineWidth(strokeWeight);
         ofSetColor(colorStroke);
         ofNoFill();

@@ -36,6 +36,7 @@ class ofxBezierEditor{
 		void setLastVertexSelected(int v){ lastVertexSelected = v; };
 
         void draw();
+        void drawOutline();
         void drawHelp();
         virtual void mouseMoved(ofMouseEventArgs &args);
         virtual void mouseDragged(ofMouseEventArgs &args);
@@ -75,6 +76,8 @@ class ofxBezierEditor{
 		void setTranslateY(float t){ translateY = t; };
 
 		ofPoint getCenter(){ return center; };
+
+		void setReactToMouseAndKeyEvents(bool b);
 
 	private:
         int currentPointToMove;

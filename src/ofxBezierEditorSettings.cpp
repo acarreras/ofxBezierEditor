@@ -7,8 +7,12 @@
 
 #include "ofxBezierEditorSettings.h"
 
-ofxBezierEditorSettings::ofxBezierEditorSettings() {
-    // Initialization
+ofxBezierEditorSettings::ofxBezierEditorSettings(std::vector<draggableVertex>& curveVertices,
+                                                 std::vector<draggableVertex>& controlPoint1,
+                                                 std::vector<draggableVertex>& controlPoint2)
+: curveVertices(curveVertices), controlPoint1(controlPoint1), controlPoint2(controlPoint2) {
+    
+    
 }
 
 ofxBezierEditorSettings::~ofxBezierEditorSettings() {
@@ -42,7 +46,9 @@ void ofxBezierEditorSettings::loadPoints(string filename){
         bIsClosed = JSONBezier["bezier"]["closed"].get<bool>();
         ofLogVerbose("ofxBezierEditor") << "bIsClosed: " << bIsClosed;
         
-        polyLineFromPoints.setClosed(bIsClosed);
+        //polyLineFromPoints.setClosed(bIsClosed);
+        
+        
         bfillBezier = JSONBezier["bezier"]["fill"].get<bool>();
         colorFill.set(
                       JSONBezier["bezier"]["colorFill"]["r"].get<int>(),
@@ -96,7 +102,8 @@ void ofxBezierEditorSettings::loadPoints(string filename){
     } else {
         ofLogVerbose() << "ofxBezierEditor::loadPoints(): File does not exist.";
     }
-    updateAllFromVertices();
+    
+    triggerUpdate();
 }
 
 //--------------------------------------------------------------
@@ -143,4 +150,9 @@ void ofxBezierEditorSettings::savePoints(string filename){
     // Save JSON to a file
     ofSavePrettyJson(filename, JSONBezier);
     
+}
+void ofxBezierEditorSettings::triggerUpdate(){
+    TriggerUpdateEventArgs args;
+    // Set any necessary properties of args
+    ofNotifyEvent(triggerUpdateEvent, args, this);
 }

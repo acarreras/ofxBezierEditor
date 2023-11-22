@@ -7,7 +7,13 @@
 
 #include "ofxBezierDraw.h"
 
-ofxBezierDraw::ofxBezierDraw() {
+ofxBezierDraw::ofxBezierDraw(ofxBezierEditorSettings& settings,
+                             std::vector<draggableVertex>& curveVertices,
+                             std::vector<draggableVertex>& controlPoint1,
+                             std::vector<draggableVertex>& controlPoint2)
+: settings(settings), curveVertices(curveVertices), controlPoint1(controlPoint1), controlPoint2(controlPoint2) {
+
+    
     // Initialization
 }
 
@@ -19,9 +25,9 @@ void ofxBezierDraw::draw(){
     
     if(curveVertices.size() > 0){
         ofPushMatrix();
-        if(bfillBezier && bIsClosed){
+        if(settings.bfillBezier && settings.bIsClosed){
             ofFill();
-            ofSetColor(colorFill);
+            ofSetColor(settings.colorFill);
             ofBeginShape();
             for (int i = 0; i < curveVertices.size(); i++){
                 if (i == 0){
@@ -34,11 +40,11 @@ void ofxBezierDraw::draw(){
             
             ofBezierVertex(controlPoint1.at(0).pos.x, controlPoint1.at(0).pos.y, controlPoint2.at(0).pos.x, controlPoint2.at(0).pos.y, curveVertices.at(0).pos.x, curveVertices.at(0).pos.y);
             
-            ofEndShape(bIsClosed);
+            ofEndShape(settings.bIsClosed);
         }
         
         
-        ofSetColor(colorStroke);
+        ofSetColor(settings.colorStroke);
         ofNoFill();
         ofBeginShape();
         for (int i = 0; i < curveVertices.size(); i++){
@@ -49,11 +55,11 @@ void ofxBezierDraw::draw(){
                 ofBezierVertex(controlPoint1.at(i).pos.x, controlPoint1.at(i).pos.y, controlPoint2.at(i).pos.x, controlPoint2.at(i).pos.y, curveVertices.at(i).pos.x, curveVertices.at(i).pos.y);
             }
         }
-        if(bIsClosed){
+        if(settings.bIsClosed){
             
             ofBezierVertex(controlPoint1.at(0).pos.x, controlPoint1.at(0).pos.y, controlPoint2.at(0).pos.x, controlPoint2.at(0).pos.y, curveVertices.at(0).pos.x, curveVertices.at(0).pos.y);
         }
-        ofEndShape(bIsClosed);
+        ofEndShape(settings.bIsClosed);
         ofPopMatrix();
     }
     
@@ -66,7 +72,7 @@ void ofxBezierDraw::drawOutline(){
     
     if(curveVertices.size() > 0){
         
-        ofSetColor(colorStroke);
+        ofSetColor(settings.colorStroke);
         ofNoFill();
         ofBeginShape();
         for (int i = 0; i < curveVertices.size(); i++){
@@ -77,22 +83,39 @@ void ofxBezierDraw::drawOutline(){
                 ofBezierVertex(controlPoint1.at(i).pos.x, controlPoint1.at(i).pos.y, controlPoint2.at(i).pos.x, controlPoint2.at(i).pos.y, curveVertices.at(i).pos.x, curveVertices.at(i).pos.y);
             }
         }
-        if(bIsClosed){
+        if(settings.bIsClosed){
             ofBezierVertex(controlPoint1.at(0).pos.x, controlPoint1.at(0).pos.y, controlPoint2.at(0).pos.x, controlPoint2.at(0).pos.y, curveVertices.at(0).pos.x, curveVertices.at(0).pos.y);
         }
-        ofEndShape(bIsClosed);
+        ofEndShape(settings.bIsClosed);
         ofPopMatrix();
     }
     
 }
 
+void ofxBezierDraw::drawWithNormals(const ofPolyline& polyline) {
+    
+    ofPushStyle(); // Push the current style settings
+    for (int i = 0; i < polyline.size(); i++) {
+        const ofPoint& cur = polyline[i];
+        const ofPoint& normal = polyline.getNormalAtIndex(i);
+        
+        ofPushMatrix();
+        ofTranslate(cur.x, cur.y, 0);
+        
+        ofSetColor(255, 0, 255); // Set color before drawing lines
+        
+        ofDrawLine(0, 0, normal.x * 20, normal.y * 20); // Draw normals
+        
+        ofPopMatrix();
+    }
+}
 //--------------------------------------------------------------
 void ofxBezierDraw::drawHelp(){
     ofSetBackgroundColor(200);
     if(curveVertices.size() > 0){
         draw();
         
-        drawWithNormals(polyLineFromPoints);
+        drawWithNormals(normalLine);
         ofPushMatrix();
         ofSetLineWidth(1);
         ofNoFill();
@@ -107,149 +130,117 @@ void ofxBezierDraw::drawHelp(){
         
         
         for (int i = 0; i < curveVertices.size(); i++){
-            ofSetColor(vertexColour);
+            ofSetColor(settings.vertexColour);
             ofNoFill();
             if(curveVertices.at(i).bOver == true){
-                ofSetColor(vertexHoverColor);
+                ofSetColor(settings.vertexHoverColor);
                 ofFill();
             }
             if(curveVertices.at(i).bBeingDragged == true){
-                ofSetColor(vertexDraggedColour);
+                ofSetColor(settings.vertexDraggedColour);
                 ofFill();
             }
-            ofDrawCircle(curveVertices.at(i).pos.x, curveVertices.at(i).pos.y, radiusVertex);
+            ofDrawCircle(curveVertices.at(i).pos.x, curveVertices.at(i).pos.y, settings.radiusVertex);
             if(curveVertices.at(i).bBeingSelected == true){
-                ofSetColor(vertexSelectedColour);
+                ofSetColor(settings.vertexSelectedColour);
                 ofFill();
-                ofDrawCircle(curveVertices.at(i).pos.x, curveVertices.at(i).pos.y, radiusVertex);
+                ofDrawCircle(curveVertices.at(i).pos.x, curveVertices.at(i).pos.y, settings.radiusVertex);
                 ofNoFill();
-                ofDrawCircle(curveVertices.at(i).pos.x, curveVertices.at(i).pos.y, 2*radiusVertex);
+                ofDrawCircle(curveVertices.at(i).pos.x, curveVertices.at(i).pos.y, 2*settings.radiusVertex);
             }
-            ofSetColor(vertexLabelColour);
+            ofSetColor(settings.vertexLabelColour);
             ofDrawBitmapString("v_" + ofToString(i), curveVertices.at(i).pos.x+3, curveVertices.at(i).pos.y+3);
         }
         
         
         for (int i = 0; i < controlPoint1.size(); i++){
-            ofSetColor(ctrPtColour);
+            ofSetColor(settings.ctrPtColour);
             ofNoFill();
             if(controlPoint1.at(i).bOver == true){
-                ofSetColor(ctrPtHoverColor);
+                ofSetColor(settings.ctrPtHoverColor);
                 ofFill();
             }
             if(controlPoint1.at(i).bBeingDragged == true){
-                ofSetColor(ctrPtDraggedColour);
+                ofSetColor(settings.ctrPtDraggedColour);
                 ofFill();
             }
-            ofDrawCircle(controlPoint1.at(i).pos.x, controlPoint1.at(i).pos.y, radiusControlPoints);
-            ofSetColor(ctrPtLabelColour);
+            ofDrawCircle(controlPoint1.at(i).pos.x, controlPoint1.at(i).pos.y, settings.radiusControlPoints);
+            ofSetColor(settings.ctrPtLabelColour);
             ofDrawBitmapString("cp1_" + ofToString(i), controlPoint1.at(i).pos.x+3, controlPoint1.at(i).pos.y+3);
         }
         
         for (int i = 0; i < controlPoint2.size(); i++){
-            ofSetColor(ctrPtColour);
+            ofSetColor(settings.ctrPtColour);
             ofNoFill();
             if(controlPoint2.at(i).bOver == true){
-                ofSetColor(ctrPtHoverColor);
+                ofSetColor(settings.ctrPtHoverColor);
                 ofFill();
             }
             if(controlPoint2.at(i).bBeingDragged == true){
-                ofSetColor(ctrPtDraggedColour);
+                ofSetColor(settings.ctrPtDraggedColour);
                 ofFill();
             }
-            ofDrawCircle(controlPoint2.at(i).pos.x, controlPoint2.at(i).pos.y, radiusControlPoints);
-            ofSetColor(ctrPtLabelColour);
+            ofDrawCircle(controlPoint2.at(i).pos.x, controlPoint2.at(i).pos.y, settings.radiusControlPoints);
+            ofSetColor(settings.ctrPtLabelColour);
             ofDrawBitmapString("cp2_" + ofToString(i), controlPoint2.at(i).pos.x+3, controlPoint2.at(i).pos.y+3);
         }
         
-        int range = currentPointToMove / curveVertices.size();
-        int mod = currentPointToMove % curveVertices.size();
+        int range = settings.currentPointToMove / curveVertices.size();
+        int mod = settings.currentPointToMove % curveVertices.size();
+        
         ofNoFill();
+        
         if(range == 0){
             ofSetColor(255,255,0);
-            ofDrawCircle(curveVertices.at(mod).pos.x, curveVertices.at(mod).pos.y, 2*radiusControlPoints);
+            ofDrawCircle(curveVertices.at(mod).pos.x, curveVertices.at(mod).pos.y, 2*settings.radiusControlPoints);
             ofSetColor(255,255,0);
             ofDrawBitmapString("fine tune with arrows", curveVertices.at(mod).pos.x+3, curveVertices.at(mod).pos.y+3);
         }
+        
         else if(range == 1){
             ofSetColor(255,0,255);
-            ofDrawCircle(controlPoint1.at(mod).pos.x, controlPoint1.at(mod).pos.y, 2*radiusControlPoints);
+            ofDrawCircle(controlPoint1.at(mod).pos.x, controlPoint1.at(mod).pos.y, 2*settings.radiusControlPoints);
             ofSetColor(255,0,255);
             ofDrawBitmapString("fine tune with arrows", controlPoint1.at(mod).pos.x+3, controlPoint1.at(mod).pos.y+3);
         }
+        
         else if(range == 2){
             ofSetColor(255,0,0);
-            ofDrawCircle(controlPoint2.at(mod).pos.x, controlPoint2.at(mod).pos.y, 2*radiusControlPoints);
+            ofDrawCircle(controlPoint2.at(mod).pos.x, controlPoint2.at(mod).pos.y, 2*settings.radiusControlPoints);
             ofSetColor(255,0,0);
             ofDrawBitmapString("fine tune with arrows", controlPoint2.at(mod).pos.x+3, controlPoint2.at(mod).pos.y+3);
         }
         
-        if(bshowBoundingBox){
+        if(settings.bshowBoundingBox){
             ofFill();
             ofSetColor(10,250,255,150);
-            ofDrawRectangle(boundingBox);
+            ofDrawRectangle(settings.boundingBox);
             ofNoFill();
             ofSetLineWidth(2);
             ofSetColor(10,250,255);
-            ofDrawRectangle(boundingBox);
+            ofDrawRectangle(settings.boundingBox);
         }
         ofPopMatrix();
-        
-        
-        
     }
     
     ofSetColor(0,0,0);
-    ofDrawBitmapString("VERTEX: " + ofToString(curveVertices.size()) + "PRESS e to EDIT the BEZIER: " + ofToString(beditBezier), 20,20);
+    ofDrawBitmapString("VERTEX: " + ofToString(curveVertices.size()) + " PRESS e to EDIT the BEZIER: " + ofToString(settings.beditBezier), 20,20);
     ofDrawBitmapString("mouse left button to add a point at the end", 20,40);
     ofDrawBitmapString("backspace to delete last point added", 20,60);
     ofDrawBitmapString("drag mouse to move vertex and control points", 20,80);
     ofDrawBitmapString("mouse right button to select two vertex", 20,100);
     ofDrawBitmapString("mouse right button to add a new vertex between the two selected vertex", 20,120);
     ofDrawBitmapString("supr to delete last vertex added", 20,140);
-    ofDrawBitmapString("currentPointToMove [n++|m--]: " + ofToString(currentPointToMove) + "\n fine tune with arrows", 20,160);
+    ofDrawBitmapString("currentPointToMove [n++|m--]: " + ofToString(settings.currentPointToMove) + "\n fine tune with arrows", 20,160);
     ofDrawBitmapString("[l] load stored bezier", 20,200);
     ofDrawBitmapString("[s] save current bezier", 20,220);
-    ofDrawBitmapString("[f] toogle fill: " + ofToString(bfillBezier), 20,240);
-    ofDrawBitmapString("[b] show/hide bounding box: " + ofToString(bshowBoundingBox), 20,260);
+    ofDrawBitmapString("[f] toogle fill: " + ofToString(settings.bfillBezier), 20,240);
+    ofDrawBitmapString("[b] show/hide bounding box: " + ofToString(settings.bshowBoundingBox), 20,260);
     ofDrawBitmapString("drag bounding box to move all the bezier", 20,280);
-    ofDrawBitmapString("COLORS:\nfill " + ofToString((float)colorFill.r) + "(r) " + ofToString((float)colorFill.g) + "(g) " + ofToString((float)colorFill.b) + "(b)" + "\nstroke " + ofToString((float)colorStroke.r) + "(r) " + ofToString((float)colorStroke.g) + "(g) " + ofToString((float)colorStroke.b) + "(b)", 20,300);
+    ofDrawBitmapString("COLORS:\nfill " + ofToString((float)settings.colorFill.r) + "(r) " + ofToString((float)settings.colorFill.g) + "(g) " + ofToString((float)settings.colorFill.b) + "(b)" + "\nstroke " + ofToString((float)settings.colorStroke.r) + "(r) " + ofToString((float)settings.colorStroke.g) + "(g) " + ofToString((float)settings.colorStroke.b) + "(b)", 20,300);
     
 }
 
-void ofxBezierDraw::setColorFill(ofColor c){
-    colorFill = c;
-}
-void ofxBezierDraw::setColorFill(float r, float g, float b, float a){
-    colorFill = ofColor(r,g,b,a);
-}
-void ofxBezierDraw::setColorFillR(float c){
-    colorFill.r = c;
-}
-void ofxBezierDraw::setColorFillG(float c){
-    colorFill.g = c;
-}
-void ofxBezierDraw::setColorFillB(float c){
-    colorFill.b = c;
-}
-void ofxBezierDraw::setColorFillA(float a){
-    colorFill.a = a;
-}
-void ofxBezierDraw::setColorStroke(ofColor c){
-    colorStroke = c;
-}
-void ofxBezierDraw::setColorStroke(float r, float g, float b, float a){
-    colorStroke = ofColor(r,g,b,a);
-}
-void ofxBezierDraw::setColorStrokeR(float c){
-    colorStroke.r = c;
-}
-void ofxBezierDraw::setColorStrokeG(float c){
-    colorStroke.g = c;
-}
-void ofxBezierDraw::setColorStrokeB(float c){
-    colorStroke.b = c;
-}
-void ofxBezierDraw::setColorStrokeA(float a){
-    colorStroke.a = a;
+void ofxBezierDraw::updateNormalLine(ofPolyline line){
+    normalLine = line;
 }

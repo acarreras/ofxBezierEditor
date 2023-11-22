@@ -7,8 +7,8 @@
 
 #include "ofxBezierRibbonMeshBuilder.h"
 
-ofxBezierRibbonMeshBuilder::ofxBezierRibbonMeshBuilder() {
-    // Initialization
+ofxBezierRibbonMeshBuilder::ofxBezierRibbonMeshBuilder(ofxBezierEditorSettings& settings) : settings(settings){
+
 }
 
 ofxBezierRibbonMeshBuilder::~ofxBezierRibbonMeshBuilder() {
@@ -51,8 +51,8 @@ void ofxBezierRibbonMeshBuilder::generateTriangleStripFromPolyline(ofPolyline in
             tangents.push_back(tangent);
             if (i < workerLine.size() - 2) {
                 // Add intermediate points and tangents based on precisionMultiplier
-                for (int j = 1; j < meshLengthPrecisionMultiplier; j++) {
-                    float t = static_cast<float>(j) / static_cast<float>(meshLengthPrecisionMultiplier);
+                for (int j = 1; j < settings.meshLengthPrecisionMultiplier; j++) {
+                    float t = static_cast<float>(j) / static_cast<float>(settings.meshLengthPrecisionMultiplier);
                     ofVec3f interpolatedPoint = workerLine.getPointAtIndexInterpolated(i + t);
                     ofVec2f interpolatedTangent = workerLine.getTangentAtIndexInterpolated(i + t);
                     points.push_back(interpolatedPoint);
@@ -65,9 +65,9 @@ void ofxBezierRibbonMeshBuilder::generateTriangleStripFromPolyline(ofPolyline in
         
         float totalLineLength = 0;
         
-        if(roundCap){
-            segmentDistances.push_back(ribbonWidth/2);
-            totalLineLength +=  ribbonWidth;
+        if(settings.roundCap){
+            segmentDistances.push_back(settings.ribbonWidth/2);
+            totalLineLength +=  settings.ribbonWidth;
         }
         else{
             segmentDistances.push_back(0);
@@ -82,7 +82,7 @@ void ofxBezierRibbonMeshBuilder::generateTriangleStripFromPolyline(ofPolyline in
             totalLineLength += distance;
         }
         
-        if(roundCap){
+        if(settings.roundCap){
             //get the poiunts on a hald circle for the cap, the circle centre is the first point and the direction is the tangent. There should be 20 pounts on the half circle.
             generateCurvedRibbonCap(points[0], tangents[0], true, totalLineLength);
         }
@@ -94,8 +94,8 @@ void ofxBezierRibbonMeshBuilder::generateTriangleStripFromPolyline(ofPolyline in
             
             // Calculate the vertices for both sides
             ofVec3f currentPoint = points[i];
-            ofVec3f leftVertex = currentPoint - perpendicular * (ribbonWidth * 0.5);
-            ofVec3f rightVertex = currentPoint + perpendicular * (ribbonWidth * 0.5);
+            ofVec3f leftVertex = currentPoint - perpendicular * (settings.ribbonWidth * 0.5);
+            ofVec3f rightVertex = currentPoint + perpendicular * (settings.ribbonWidth * 0.5);
             
             // Add vertices to the mesh in a zigzag manner, suitable for a triangle strip
             ribbonMesh.addVertex(leftVertex); // Add left vertex
@@ -104,7 +104,7 @@ void ofxBezierRibbonMeshBuilder::generateTriangleStripFromPolyline(ofPolyline in
             ribbonMesh.addTexCoord(ofVec2f(1, segmentDistances[i] / totalLineLength)); // Add left texture coordinate
         }
         
-        if(roundCap){
+        if(settings.roundCap){
             //get the poiunts on a hald circle for the cap, the circle centre is the first point and the direction is the tangent. There should be 20 pounts on the half circle.
             generateCurvedRibbonCap(points[points.size()-1], tangents[tangents.size()-1], false, totalLineLength);
         }
@@ -138,7 +138,7 @@ void ofxBezierRibbonMeshBuilder::generateCurvedRibbonCap(ofVec3f centre,  ofVec3
         }
         
         // Calculate the point on the circle using cosine and sine for the respective axes
-        ofVec3f circlePoint = circleCenter + circleTangent * cos(angle) * (ribbonWidth * 0.5) + circleNormal * sin(angle) * (ribbonWidth * 0.5);
+        ofVec3f circlePoint = circleCenter + circleTangent * cos(angle) * (settings.ribbonWidth * 0.5) + circleNormal * sin(angle) * (settings.ribbonWidth * 0.5);
         
         
         // Add the calculated point to the half circle points vector
@@ -147,19 +147,19 @@ void ofxBezierRibbonMeshBuilder::generateCurvedRibbonCap(ofVec3f centre,  ofVec3
         
         
         // Now calculate distances relative to the equator
-        float distanceToEquator = ribbonWidth * 0.5  * 0.5  + ((ribbonWidth * 0.5  * 0.5) * sin(angle));
-        float distanceToEquatorPerp = abs((ribbonWidth * 0.5) * cos(angle));
+        float distanceToEquator = settings.ribbonWidth * 0.5  * 0.5  + ((settings.ribbonWidth * 0.5  * 0.5) * sin(angle));
+        float distanceToEquatorPerp = abs((settings.ribbonWidth * 0.5) * cos(angle));
         
         
-        float texCoordX = distanceToEquator / (ribbonWidth * 0.5); // Normalize between 0 and 1
+        float texCoordX = distanceToEquator / (settings.ribbonWidth * 0.5); // Normalize between 0 and 1
         
         float texCoordY;
         if(forwards){
-            texCoordY  = (ribbonWidth / 2 - distanceToEquatorPerp)/totalLineLength; // Normalize angle between 0 and 1
+            texCoordY  = (settings.ribbonWidth / 2 - distanceToEquatorPerp)/totalLineLength; // Normalize angle between 0 and 1
             
         }
         else{
-            texCoordY  = (distanceToEquatorPerp + (totalLineLength - ribbonWidth/2)) /totalLineLength; // Normalize angle between 0 and 1
+            texCoordY  = (distanceToEquatorPerp + (totalLineLength - settings.ribbonWidth/2)) /totalLineLength; // Normalize angle between 0 and 1
         }
         
         // Add texture coordinates for the semicircle point
@@ -167,11 +167,11 @@ void ofxBezierRibbonMeshBuilder::generateCurvedRibbonCap(ofVec3f centre,  ofVec3
         
         //the next texCoord is always the circle centre, this is easy to find
         if(forwards){
-            ribbonMesh.addTexCoord(ofVec2f(0.5, (ribbonWidth/2) /totalLineLength));
+            ribbonMesh.addTexCoord(ofVec2f(0.5, (settings.ribbonWidth/2) /totalLineLength));
             
         }
         else{
-            ribbonMesh.addTexCoord(ofVec2f(0.5, (totalLineLength - (ribbonWidth/2)) /totalLineLength));
+            ribbonMesh.addTexCoord(ofVec2f(0.5, (totalLineLength - (settings.ribbonWidth/2)) /totalLineLength));
             
         }
     }

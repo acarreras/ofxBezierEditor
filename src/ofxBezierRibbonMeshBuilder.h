@@ -7,18 +7,26 @@
 
 #pragma once
 #include "ofMain.h"
+#include "ofxBezierEditorSettings.h"
+#include "draggableVertex.h"
+#include "ofxBezierEvents.h"
 
 class ofxBezierRibbonMeshBuilder {
 public:
-    ofxBezierRibbonMeshBuilder();
+    ofxBezierRibbonMeshBuilder(ofxBezierEditorSettings& settings);
+    
     ~ofxBezierRibbonMeshBuilder();
+    
+
     ofVboMesh getRibbonMesh() { return ribbonMesh; };
     ofVboMesh getRibbonMeshFromPolyline(ofPolyline inPoly);
+    void generateTriangleStripFromPolyline(ofPolyline inPoly);
 
 
 private:
     ofVboMesh ribbonMesh;
-    void generateTriangleStripFromPolyline(ofPolyline inPoly);
-
+    void generateCurvedRibbonCap(ofVec3f centre,  ofVec3f tangent, bool forwards, float totalLineLength);
+    ofxBezierEditorSettings& settings;
+    void onTriggerUpdate(TriggerUpdateEventArgs& args);
 
 };

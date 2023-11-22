@@ -8,18 +8,22 @@
 
 #pragma once
 #include "ofMain.h"
+#include "ofxBezierEditorSettings.h"
+#include "ofxBezierEvents.h"
 
 class ofxBezierTubeMeshBuilder {
 public:
-    ofxBezierTubeMeshBuilder();
+    ofxBezierTubeMeshBuilder(ofxBezierEditorSettings& settings);
+    
     ~ofxBezierTubeMeshBuilder();
 
     ofVboMesh getTubeMesh() { return tubeMesh; };
     ofVboMesh getTubeMeshFromPolyline(ofPolyline inPoly);
+    void generateTubeMeshFromPolyline(ofPolyline inPoly);
+
 
 private:
     
-    void generateTubeMeshFromPolyline(ofPolyline inPoly);
     
     void createLatitudeRings(vector<vector<ofVec3f>>& allCircles, vector<vector<ofVec3f>>& allCircleNormals, vector<vector<ofVec2f>>& allCircleTexCoords, const ofVec3f& center, const ofVec3f& extension, float tubeResolution, float tubeRadius,bool forwards);
     
@@ -37,5 +41,9 @@ private:
                  vector<vector<ofVec2f>>& allCircleTexCoords, const ofVec3f& ringCenter, float radius,const ofVec3f& tangent, const ofVec3f& norma, const ofVec3f& sphereCenter, float distanceFromStart, float _totalLineLength);
     
     ofVboMesh tubeMesh;
+    
+    ofxBezierEditorSettings& settings;
+
+    void onTriggerUpdate(TriggerUpdateEventArgs& args);
 
 };

@@ -7,8 +7,14 @@
 
 #include "ofxBezierUI.h"
 
-ofxBezierUI::ofxBezierUI() {
+ofxBezierUI::ofxBezierUI(ofxBezierEditorSettings& settings,
+                         std::vector<draggableVertex>& curveVertices,
+                         std::vector<draggableVertex>& controlPoint1,
+                         std::vector<draggableVertex>& controlPoint2)
+: settings(settings), curveVertices(curveVertices), controlPoint1(controlPoint1), controlPoint2(controlPoint2) {
+
     setReactToMouseAndKeyEvents(true);
+    
 }
 
 ofxBezierUI::~ofxBezierUI() {
@@ -16,12 +22,12 @@ ofxBezierUI::~ofxBezierUI() {
 }
 
 void ofxBezierUI::mouseMoved(ofMouseEventArgs &args){
-    if(beditBezier == true){
+    if(settings.beditBezier == true){
         for (int i = 0; i < curveVertices.size(); i++){
             float diffx = args.x - curveVertices.at(i).pos.x;
             float diffy = args.y - curveVertices.at(i).pos.y;
             float dist = sqrt(diffx*diffx + diffy*diffy);
-            if (dist < radiusVertex){
+            if (dist < settings.radiusVertex){
                 curveVertices.at(i).bOver = true;
             } else {
                 curveVertices.at(i).bOver = false;
@@ -32,7 +38,7 @@ void ofxBezierUI::mouseMoved(ofMouseEventArgs &args){
             float diffx = args.x - controlPoint1.at(i).pos.x;
             float diffy = args.y - controlPoint1.at(i).pos.y;
             float dist = sqrt(diffx*diffx + diffy*diffy);
-            if (dist < radiusControlPoints){
+            if (dist < settings.radiusControlPoints){
                 controlPoint1.at(i).bOver = true;
             } else {
                 controlPoint1.at(i).bOver = false;
@@ -43,7 +49,7 @@ void ofxBezierUI::mouseMoved(ofMouseEventArgs &args){
             float diffx = args.x - controlPoint2.at(i).pos.x;
             float diffy = args.y - controlPoint2.at(i).pos.y;
             float dist = sqrt(diffx*diffx + diffy*diffy);
-            if (dist < radiusControlPoints){
+            if (dist < settings.radiusControlPoints){
                 controlPoint2.at(i).bOver = true;
             } else {
                 controlPoint2.at(i).bOver = false;
@@ -54,8 +60,8 @@ void ofxBezierUI::mouseMoved(ofMouseEventArgs &args){
 
 //--------------------------------------------------------------
 void ofxBezierUI::mouseDragged(ofMouseEventArgs &args){
-    if(beditBezier){
-        if (bshowBoundingBox) {
+    if(settings.beditBezier){
+        if (settings.bshowBoundingBox) {
             int deltaX = args.x - mouseX;
             int deltaY = args.y - mouseY;
             
@@ -98,16 +104,16 @@ void ofxBezierUI::mouseDragged(ofMouseEventArgs &args){
                 controlPoint2.at(i).pos.y = args.y ;
             }
         }
-        updateAllFromVertices();
+        triggerUpdate();
     }
     
 }
 
 //--------------------------------------------------------------
 void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
-    if(beditBezier){
+    if(settings.beditBezier){
         if(args.button == OF_MOUSE_BUTTON_LEFT){
-            if(bshowBoundingBox){
+            if(settings.bshowBoundingBox){
                 mouseX = args.x ;
                 mouseY = args.y ;
             }
@@ -118,7 +124,7 @@ void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
                     float diffx = args.x  - curveVertices.at(i).pos.x;
                     float diffy = args.y  - curveVertices.at(i).pos.y;
                     float dist = sqrt(diffx*diffx + diffy*diffy);
-                    if (dist < radiusVertex){
+                    if (dist < settings.radiusVertex){
                         curveVertices.at(i).bBeingDragged = true;
                         bAnyVertexDragged = true;
                     } else {
@@ -130,7 +136,7 @@ void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
                     float diffx = args.x  - controlPoint1.at(i).pos.x;
                     float diffy = args.y  - controlPoint1.at(i).pos.y;
                     float dist = sqrt(diffx*diffx + diffy*diffy);
-                    if (dist < radiusControlPoints){
+                    if (dist < settings.radiusControlPoints){
                         controlPoint1.at(i).bBeingDragged = true;
                         bAnyVertexDragged = true;
                     } else {
@@ -142,7 +148,7 @@ void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
                     float diffx = args.x  - controlPoint2.at(i).pos.x;
                     float diffy = args.y  - controlPoint2.at(i).pos.y;
                     float dist = sqrt(diffx*diffx + diffy*diffy);
-                    if (dist < radiusControlPoints){
+                    if (dist < settings.radiusControlPoints){
                         controlPoint2.at(i).bBeingDragged = true;
                         bAnyVertexDragged = true;
                     } else {
@@ -172,7 +178,7 @@ void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
                     cp.pos.y = ofLerp(curveVertices.at(0).pos.y , curveVertices.at(nEnd).pos.y , 0.33);
                     controlPoint2.push_back(cp);
                     
-                    updateAllFromVertices();
+                    triggerUpdate();
                     
                 }
             }
@@ -184,7 +190,7 @@ void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
                 float diffx = args.x  - curveVertices.at(i).pos.x;
                 float diffy = args.y  - curveVertices.at(i).pos.y;
                 float dist = sqrt(diffx*diffx + diffy*diffy);
-                if (dist < radiusVertex){
+                if (dist < settings.radiusVertex){
                     curveVertices.at(i).bBeingSelected = !curveVertices.at(i).bBeingSelected;
                     bAnyVertexSelected = true;
                 }
@@ -220,7 +226,7 @@ void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
                     cp.pos.y = ofLerp(curveVertices.at(lastVertexSelected-1).pos.y , curveVertices.at(lastVertexSelected).pos.y , 0.33);
                     controlPoint2.insert(controlPoint2.begin()+lastVertexSelected,cp);
                     
-                    updateAllFromVertices();
+                    triggerUpdate();
                 }
             }
         }
@@ -229,7 +235,7 @@ void ofxBezierUI::mousePressed(ofMouseEventArgs &args){
 
 //--------------------------------------------------------------
 void ofxBezierUI::mouseReleased(ofMouseEventArgs &args){
-    if(beditBezier){
+    if(settings.beditBezier){
         for (int i = 0; i < curveVertices.size(); i++){
             curveVertices.at(i).bBeingDragged = false;
         }
@@ -254,26 +260,29 @@ void ofxBezierUI::mouseExited(ofMouseEventArgs &args){
 //--------------------------------------------------------------
 void ofxBezierUI::keyPressed(ofKeyEventArgs &args){
     if(args.key == 'e'){
-        beditBezier = !beditBezier;
+        settings.beditBezier = !settings.beditBezier;
     }
     
-    if(beditBezier){
+    if(settings.beditBezier){
         if(args.key == 's'){
-            savePoints(jsonFileName);
+            settings.savePoints(settings.jsonFileName);
         }
         
         else if(args.key == 'l'){
-            loadPoints(jsonFileName);
+            settings.loadPoints(settings.jsonFileName);
+            triggerUpdate();
         }
         else if(args.key == 'f'){
-            bfillBezier = !bfillBezier;
+            settings.bfillBezier = !settings.bfillBezier;
+            triggerUpdate();
         }
         else if(args.key == 'b'){
-            bshowBoundingBox = !bshowBoundingBox;
+            settings.bshowBoundingBox = !settings.bshowBoundingBox;
+            triggerUpdate();
         }
         else if(args.key == 'c'){
-            bIsClosed = !bIsClosed;
-            updatePolyline();
+            settings.bIsClosed = !settings.bIsClosed;
+            triggerUpdate();
         }
         
         else if(args.key == 'n'){
@@ -346,7 +355,7 @@ void ofxBezierUI::keyPressed(ofKeyEventArgs &args){
             controlPoint1.pop_back();
             controlPoint2.pop_back();
             
-            updateAllFromVertices();
+            triggerUpdate();
         }
         if(args.key == OF_KEY_DEL){
             // REMOVE last intermediate vertex added
@@ -354,11 +363,13 @@ void ofxBezierUI::keyPressed(ofKeyEventArgs &args){
             controlPoint1.erase(controlPoint1.begin()+lastVertexSelected);
             controlPoint2.erase(controlPoint2.begin()+lastVertexSelected);
             
-            updateAllFromVertices();
+            triggerUpdate();
         }
     }
 }
 
+void ofxBezierUI::keyReleased(ofKeyEventArgs &args){
+}
 
 
 //--------------------------------------------------------------
@@ -377,6 +388,7 @@ void ofxBezierUI::registerToEvents(){
     ofRegisterMouseEvents(this);
     ofRegisterKeyEvents(this);
 }
+
 void ofxBezierUI::unregisterFromEvents(){
     ofUnregisterMouseEvents(this);
     ofUnregisterKeyEvents(this);
@@ -384,3 +396,8 @@ void ofxBezierUI::unregisterFromEvents(){
 
 
 
+void ofxBezierUI::triggerUpdate(){
+    TriggerUpdateEventArgs args;
+    // Set any necessary properties of args
+    ofNotifyEvent(triggerUpdateEvent, args, this);
+}

@@ -8,9 +8,17 @@
 #pragma once
 #include "ofMain.h"
 
+#include "ofxBezierEditorSettings.h"
+#include "draggableVertex.h"
+#include "ofxBezierEvents.h"
+
 class ofxBezierUI {
 public:
-    ofxBezierUI();
+    ofxBezierUI(ofxBezierEditorSettings& settings,
+                  std::vector<draggableVertex>& curveVertices,
+                  std::vector<draggableVertex>& controlPoint1,
+                  std::vector<draggableVertex>& controlPoint2);
+    
     ~ofxBezierUI();
 
     // Mouse and Key Event Handlers
@@ -31,9 +39,6 @@ public:
     int getLastVertexSelected() { return lastVertexSelected; };
     void setLastVertexSelected(int v) { lastVertexSelected = v; };
     
-    int getRadiusControlPoints() { return radiusControlPoints; };
-    void setRadiusControlPoints(int r) { radiusControlPoints = r; };
-    
     // Event Handling
     void setReactToMouseAndKeyEvents(bool b);
     void registerToEvents();
@@ -49,6 +54,11 @@ private:
     float translateX, translateY;
     float mouseX, mouseY;
     bool bfillBezier;
-
+    
+    ofxBezierEditorSettings& settings;
+    std::vector<draggableVertex>& curveVertices;
+    std::vector<draggableVertex>& controlPoint1;
+    std::vector<draggableVertex>& controlPoint2;
+    void triggerUpdate();
 };
 

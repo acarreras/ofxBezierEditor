@@ -10,8 +10,8 @@
 #include "ofMain.h"
 
 class TriggerUpdateEventArgs : public ofEventArgs {
-    // Define any arguments you want to pass with the event
-    // For a simple trigger, you might not need to pass any data
+	// Define any arguments you want to pass with the event
+	// For a simple trigger, you might not need to pass any data
 };
 
-extern ofEvent<TriggerUpdateEventArgs> triggerUpdateEvent;
+extern ofEvent <TriggerUpdateEventArgs> triggerUpdateEvent;

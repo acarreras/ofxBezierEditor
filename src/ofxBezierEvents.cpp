@@ -7,4 +7,4 @@
 
 #include "ofxBezierEvents.h"
 
-ofEvent<TriggerUpdateEventArgs> triggerUpdateEvent;
+ofEvent <TriggerUpdateEventArgs> triggerUpdateEvent;

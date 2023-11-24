@@ -7,10 +7,10 @@
 #pragma once
 
 class draggableVertex {
-public:
-    glm::vec2 pos = glm::vec2(0,0);
-    bool bBeingDragged = false;
-    bool bOver = false;
-    bool bBeingSelected = false;
-    
+	public:
+		glm::vec2 pos = glm::vec2(0, 0);
+		bool bBeingDragged = false;
+		bool bOver = false;
+		bool bBeingSelected = false;
+
 };

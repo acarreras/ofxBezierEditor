@@ -226,9 +226,6 @@ void ofApp::closedToggleChanged(bool &value){
     myBezier.setClosed(value);
 }
 
-//void ofApp::drawBoundingBoxChanged(bool &value){
-//    myBezier.set
-//}
 
 void ofApp::ribbonWidthSliderChanged(float &value){
     myBezier.setRibbonWidth(value);

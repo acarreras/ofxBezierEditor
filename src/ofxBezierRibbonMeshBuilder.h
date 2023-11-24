@@ -20,7 +20,7 @@ public:
 
     ofVboMesh getRibbonMesh() { return ribbonMesh; };
     ofVboMesh getRibbonMeshFromPolyline(ofPolyline inPoly);
-    void generateTriangleStripFromPolyline(ofPolyline inPoly);
+    void generateRibbonMeshFromPolyline(ofPolyline inPoly);
 
 
 private:
@@ -28,5 +28,9 @@ private:
     void generateCurvedRibbonCap(ofVec3f centre,  ofVec3f tangent, bool forwards, float totalLineLength);
     ofxBezierEditorSettings& settings;
     void onTriggerUpdate(TriggerUpdateEventArgs& args);
+    
+    std::vector<float> segmentDistances;
+    
+    float totalLineLength = 0;
 
 };

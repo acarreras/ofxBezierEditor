@@ -40,6 +40,7 @@ public:
 
     ofParameter<bool> fillToggle;
     ofParameter<bool> closedToggle;
+    ofParameter<bool> drawBoundingBox;
     ofParameter<ofColor> fillColor;
     ofParameter<ofColor> strokeColor;
     ofParameter<float> ribbonWidthSlider;
@@ -56,6 +57,7 @@ public:
     void OperationModeSliderChanged(int &value);
     void fillToggleChanged(bool &value);
     void closedToggleChanged(bool &value);
+    void drawBoundingBoxChanged(bool &value);
     void fillColorChanged(ofColor &value);
     void strokeColorChanged(ofColor &value);
     

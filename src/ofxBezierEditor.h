@@ -16,62 +16,66 @@ public:
     ofxBezierEditor();
     ~ofxBezierEditor();
 
-
     shared_ptr<vector<draggableVertex>> curveVertices = make_shared<vector<draggableVertex>>();
     shared_ptr<vector<draggableVertex>> controlPoint1 = make_shared<vector<draggableVertex>>();
     shared_ptr<vector<draggableVertex>> controlPoint2 = make_shared<vector<draggableVertex>>();
 
-
     ofPoint getCenter() { return center; };
     ofPolyline getPolyline() { return polyLineFromPoints; }
+
+    void draw();
+    void drawHelp();
     
+    void loadPoints(string filename);
+    void savePoints(string filename);
+    void setFillBezier(bool value);
+    bool getFillBezier();
+    void setClosed(bool value);
+    bool getClosed();
+    void setRibbonWidth(float value);
+    float getRibbonWidth();
+    void setColorFill(ofColor value);
+    ofColor getColourFill();
+    void setColorStroke(ofColor value);
+    ofColor getColourStroke();
+    void setMeshLengthPrecisionMultiplier(int value);
+    int getMeshLengthPrecisionMultiplier();
+    void setTubeRadius(float value);
+    float getTubeRadius();
+    void setTubeResolution(int value);
+    int getTubeResolution();
+    void setHasRoundCaps(bool value);
+    bool getHasRoundCaps();
+    void setUseRibbonMesh(bool value);
+    bool getUseRibbonMesh();
+    void setUseTubeMesh(bool value);
+    bool getUseTubeMesh();
     
-    ofColor getColorStroke();
+    void setReactToMouseAndKeyEvents(bool value);
+    
     ofVboMesh getRibbonMesh();
-    
     ofVboMesh getRibbonMeshFromPolyline(ofPolyline polyline);
 
     ofVboMesh getTubeMesh();
     ofVboMesh getTubeMeshFromPolyline(ofPolyline polyline);
 
-
-    
-    void draw();
-    void drawHelp();
-    void loadPoints(string filename);
-    void setFillBezier(bool value);
-    void setClosed(bool value);
-    void setRibbonWidth(float value);
-    void setColorFill(ofColor value);
-    void setColorStroke(ofColor value);
-    void setMeshLengthPrecisionMultiplier(int value);
-    void setTubeRadius(float value);
-    void setTubeResolution(int value);
-    void setHasRoundCaps(bool value);
-    void setReactToMouseAndKeyEvents(bool value);
-    void setUseRibbonMesh(bool value);
-    void setUseTubeMesh(bool value);
-
 private:
 
-    void updateBoundingBox();
-
-    ofPoint center;
-    void calculateCenter();
-
-
-    ofPolyline polyLineFromPoints;
-    void updatePolyline();
-    
-    // Mesh Generation
-    void updateAllFromVertices();
-  
-    
     ofxBezierEditorSettings settings;
     ofxBezierTubeMeshBuilder tubeMeshBuilder;
     ofxBezierRibbonMeshBuilder ribbonMeshBuilder;
     ofxBezierDraw bezierDraw;
     ofxBezierUI bezierUI;
+    
+    void updateBoundingBox();
+
+    ofPoint center;
+    void calculateCenter();
+
+    ofPolyline polyLineFromPoints;
+    void updatePolyline();
+    
+    void updateAllFromVertices();
     
     void onTriggerUpdate(TriggerUpdateEventArgs& args);
 

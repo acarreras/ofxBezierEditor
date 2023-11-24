@@ -68,6 +68,9 @@ public:
     void loadPoints(string filename);
     void savePoints(string filename);
     
+    void loadPointsJson(ofJson pntsJson);
+    void savePointsJson();
+    
     int radiusControlPoints;
     int radiusVertex;
     

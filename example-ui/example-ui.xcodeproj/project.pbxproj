@@ -13,6 +13,7 @@
 		481B8E5A2B0DC6A6003403CB /* ofxBezierUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 481B8E582B0DC6A6003403CB /* ofxBezierUI.cpp */; };
 		481B8E5D2B0DC8E5003403CB /* ofxBezierEditorSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 481B8E5B2B0DC8E5003403CB /* ofxBezierEditorSettings.cpp */; };
 		48211EAB2B0E7857005A3DE6 /* ofxBezierEvents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48211EAA2B0E7857005A3DE6 /* ofxBezierEvents.cpp */; };
+		48BF84542B0F647C00F1BA29 /* ofxBezierUtility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48BF84522B0F647C00F1BA29 /* ofxBezierUtility.cpp */; };
 		E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
 		E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */; };
 		"{15A3F7F9-28D6-49DB-8AC6-4B3015C6DF03}" /* ofxButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "{5C2D9BF8-B5E0-4C9E-B920-A7D4BE39FE4C}" /* ofxButton.cpp */; };
@@ -64,6 +65,8 @@
 		481B8E5C2B0DC8E5003403CB /* ofxBezierEditorSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofxBezierEditorSettings.h; path = ../src/ofxBezierEditorSettings.h; sourceTree = "<group>"; };
 		48211EAA2B0E7857005A3DE6 /* ofxBezierEvents.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ofxBezierEvents.cpp; path = ../src/ofxBezierEvents.cpp; sourceTree = "<group>"; };
 		48211EAC2B0E7CDA005A3DE6 /* ofxBezierEvents.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofxBezierEvents.h; path = ../src/ofxBezierEvents.h; sourceTree = "<group>"; };
+		48BF84522B0F647C00F1BA29 /* ofxBezierUtility.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ofxBezierUtility.cpp; path = ../src/ofxBezierUtility.cpp; sourceTree = "<group>"; };
+		48BF84532B0F647C00F1BA29 /* ofxBezierUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofxBezierUtility.h; path = ../src/ofxBezierUtility.h; sourceTree = "<group>"; };
 		48E705792B0DEE85002F305B /* draggableVertex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = draggableVertex.h; path = ../src/draggableVertex.h; sourceTree = "<group>"; };
 		E4B69B5B0A3A1756003C02F2 /* example-uiDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "example-uiDebug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
@@ -184,6 +187,8 @@
 				481B8E522B0DC61D003403CB /* ofxBezierDraw.cpp */,
 				481B8E562B0DC664003403CB /* ofxBezierRibbonMeshBuilder.h */,
 				481B8E552B0DC664003403CB /* ofxBezierRibbonMeshBuilder.cpp */,
+				48BF84522B0F647C00F1BA29 /* ofxBezierUtility.cpp */,
+				48BF84532B0F647C00F1BA29 /* ofxBezierUtility.h */,
 				481B8E592B0DC6A6003403CB /* ofxBezierUI.h */,
 				481B8E582B0DC6A6003403CB /* ofxBezierUI.cpp */,
 				481B8E5C2B0DC8E5003403CB /* ofxBezierEditorSettings.h */,
@@ -302,6 +307,7 @@
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				"{7D65ED5D-D310-4D1D-80B7-2804F30A1D23}" /* ofxBezierEditor.cpp in Sources */,
+				48BF84542B0F647C00F1BA29 /* ofxBezierUtility.cpp in Sources */,
 				481B8E512B0DC5D5003403CB /* ofxBezierTubeMeshBuilder.cpp in Sources */,
 				"{DDDF6627-BDEC-409C-A630-9A0820AF0061}" /* ofxBaseGui.cpp in Sources */,
 				"{15A3F7F9-28D6-49DB-8AC6-4B3015C6DF03}" /* ofxButton.cpp in Sources */,

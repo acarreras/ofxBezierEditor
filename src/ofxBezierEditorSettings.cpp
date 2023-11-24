@@ -12,11 +12,95 @@ ofxBezierEditorSettings::ofxBezierEditorSettings(std::vector<draggableVertex>& c
                                                  std::vector<draggableVertex>& controlPoint2)
 : curveVertices(curveVertices), controlPoint1(controlPoint1), controlPoint2(controlPoint2) {
     
+    setRadiusVertex(8);
+    setRadiusControlPoints(6);
     
+    colorFill = ofColor(188,4,62, 100);
+    colorStroke = ofColor(2,189,190, 100);
+    
+    boundingBox.set(0,0,0,0);
+    bshowBoundingBox = false;
+    
+    beditBezier = false;
+    
+    jsonFileName = "ofxBezierInfo.json";
 }
 
 ofxBezierEditorSettings::~ofxBezierEditorSettings() {
     // Cleanup
+}
+
+void ofxBezierEditorSettings::loadPointsJson(ofJson pntsJson){
+    // Read data from JSON
+    JSONBezier = pntsJson;
+    bUseRibbonMesh = JSONBezier["bezier"]["useRibbonMesh"].get<bool>();
+    ofLogVerbose("ofxBezierEditor") << "bUseRibbonMesh: " << bUseRibbonMesh;
+    ribbonWidth = JSONBezier["bezier"]["ribbonWidth"].get<float>();
+    ofLogVerbose("ofxBezierEditor") << "ribbonWidth: " << ribbonWidth;
+    meshLengthPrecisionMultiplier = JSONBezier["bezier"]["meshLengthPrecision"].get<int>();
+    ofLogVerbose("ofxBezierEditor") << "meshLengthPrecisionMultiplier: " << meshLengthPrecisionMultiplier;
+    
+    bUseTubeMesh = JSONBezier["bezier"]["useTubeMesh"].get<bool>();
+    ofLogVerbose("ofxBezierEditor") << "bUseTubeMesh: " << bUseTubeMesh;
+    tubeRadius = JSONBezier["bezier"]["tubeRadius"].get<float>();
+    ofLogVerbose("ofxBezierEditor") << "tubeRadius: " << tubeRadius;
+    tubeResolution = JSONBezier["bezier"]["tubeResolution"].get<int>();
+    ofLogVerbose("ofxBezierEditor") << "tubeResolution: " << tubeResolution;
+    
+    
+    bIsClosed = JSONBezier["bezier"]["closed"].get<bool>();
+    ofLogVerbose("ofxBezierEditor") << "bIsClosed: " << bIsClosed;
+    
+    //polyLineFromPoints.setClosed(bIsClosed);
+    
+    
+    bfillBezier = JSONBezier["bezier"]["fill"].get<bool>();
+    colorFill.set(
+                  JSONBezier["bezier"]["colorFill"]["r"].get<int>(),
+                  JSONBezier["bezier"]["colorFill"]["g"].get<int>(),
+                  JSONBezier["bezier"]["colorFill"]["b"].get<int>(),
+                  JSONBezier["bezier"]["colorFill"]["a"].get<int>()
+                  );
+    
+    colorStroke.set(
+                    JSONBezier["bezier"]["colorStroke"]["r"].get<int>(),
+                    JSONBezier["bezier"]["colorStroke"]["g"].get<int>(),
+                    JSONBezier["bezier"]["colorStroke"]["b"].get<int>(),
+                    JSONBezier["bezier"]["colorStroke"]["a"].get<int>()
+                    );
+    
+    
+    curveVertices.clear();
+    for (const auto& vertexJson : JSONBezier["bezier"]["vertices"]) {
+        draggableVertex vtx;
+        vtx.pos.x = vertexJson["x"].get<float>();
+        vtx.pos.y = vertexJson["y"].get<float>();
+        vtx.bOver = false;
+        vtx.bBeingDragged = false;
+        vtx.bBeingSelected = false;
+        curveVertices.push_back(vtx);
+    }
+    
+    // Read control points from JSON
+    controlPoint1.clear();
+    for (const auto& cpJson : JSONBezier["bezier"]["cp1"]) {
+        draggableVertex cp;
+        cp.pos.x = cpJson["x"].get<float>();
+        cp.pos.y = cpJson["y"].get<float>();
+        cp.bOver = false;
+        cp.bBeingDragged = false;
+        controlPoint1.push_back(cp);
+    }
+    
+    controlPoint2.clear();
+    for (const auto& cpJson : JSONBezier["bezier"]["cp2"]) {
+        draggableVertex cp;
+        cp.pos.x = cpJson["x"].get<float>();
+        cp.pos.y = cpJson["y"].get<float>();
+        cp.bOver = false;
+        cp.bBeingDragged = false;
+        controlPoint2.push_back(cp);
+    }
 }
 
 //--------------------------------------------------------------
@@ -27,77 +111,7 @@ void ofxBezierEditorSettings::loadPoints(string filename){
     ofFile jsonFile(jsonFileName);
     if (jsonFile.exists()) {
         jsonFile >> JSONBezier;
-        // Read data from JSON
-        bUseRibbonMesh = JSONBezier["bezier"]["useRibbonMesh"].get<bool>();
-        ofLogVerbose("ofxBezierEditor") << "bUseRibbonMesh: " << bUseRibbonMesh;
-        ribbonWidth = JSONBezier["bezier"]["ribbonWidth"].get<float>();
-        ofLogVerbose("ofxBezierEditor") << "ribbonWidth: " << ribbonWidth;
-        meshLengthPrecisionMultiplier = JSONBezier["bezier"]["meshLengthPrecision"].get<int>();
-        ofLogVerbose("ofxBezierEditor") << "meshLengthPrecisionMultiplier: " << meshLengthPrecisionMultiplier;
-        
-        bUseTubeMesh = JSONBezier["bezier"]["useTubeMesh"].get<bool>();
-        ofLogVerbose("ofxBezierEditor") << "bUseTubeMesh: " << bUseTubeMesh;
-        tubeRadius = JSONBezier["bezier"]["tubeRadius"].get<float>();
-        ofLogVerbose("ofxBezierEditor") << "tubeRadius: " << tubeRadius;
-        tubeResolution = JSONBezier["bezier"]["tubeResolution"].get<int>();
-        ofLogVerbose("ofxBezierEditor") << "tubeResolution: " << tubeResolution;
-        
-        
-        bIsClosed = JSONBezier["bezier"]["closed"].get<bool>();
-        ofLogVerbose("ofxBezierEditor") << "bIsClosed: " << bIsClosed;
-        
-        //polyLineFromPoints.setClosed(bIsClosed);
-        
-        
-        bfillBezier = JSONBezier["bezier"]["fill"].get<bool>();
-        colorFill.set(
-                      JSONBezier["bezier"]["colorFill"]["r"].get<int>(),
-                      JSONBezier["bezier"]["colorFill"]["g"].get<int>(),
-                      JSONBezier["bezier"]["colorFill"]["b"].get<int>(),
-                      JSONBezier["bezier"]["colorFill"]["a"].get<int>()
-                      );
-        
-        colorStroke.set(
-                        JSONBezier["bezier"]["colorStroke"]["r"].get<int>(),
-                        JSONBezier["bezier"]["colorStroke"]["g"].get<int>(),
-                        JSONBezier["bezier"]["colorStroke"]["b"].get<int>(),
-                        JSONBezier["bezier"]["colorStroke"]["a"].get<int>()
-                        );
-        
-        
-        curveVertices.clear();
-        for (const auto& vertexJson : JSONBezier["bezier"]["vertices"]) {
-            draggableVertex vtx;
-            vtx.pos.x = vertexJson["x"].get<float>();
-            vtx.pos.y = vertexJson["y"].get<float>();
-            vtx.bOver = false;
-            vtx.bBeingDragged = false;
-            vtx.bBeingSelected = false;
-            curveVertices.push_back(vtx);
-        }
-        
-        // Read control points from JSON
-        controlPoint1.clear();
-        for (const auto& cpJson : JSONBezier["bezier"]["cp1"]) {
-            draggableVertex cp;
-            cp.pos.x = cpJson["x"].get<float>();
-            cp.pos.y = cpJson["y"].get<float>();
-            cp.bOver = false;
-            cp.bBeingDragged = false;
-            controlPoint1.push_back(cp);
-        }
-        
-        controlPoint2.clear();
-        for (const auto& cpJson : JSONBezier["bezier"]["cp2"]) {
-            draggableVertex cp;
-            cp.pos.x = cpJson["x"].get<float>();
-            cp.pos.y = cpJson["y"].get<float>();
-            cp.bOver = false;
-            cp.bBeingDragged = false;
-            controlPoint2.push_back(cp);
-        }
-        
-        
+        loadPointsJson(JSONBezier);
         
     } else {
         ofLogVerbose() << "ofxBezierEditor::loadPoints(): File does not exist.";
@@ -106,8 +120,7 @@ void ofxBezierEditorSettings::loadPoints(string filename){
     triggerUpdate();
 }
 
-//--------------------------------------------------------------
-void ofxBezierEditorSettings::savePoints(string filename){
+void ofxBezierEditorSettings::savePointsJson(){
     JSONBezier.clear();
     
     // Create the JSON structure
@@ -146,7 +159,11 @@ void ofxBezierEditorSettings::savePoints(string filename){
         JSONBezier["bezier"]["cp2"][i]["x"] = controlPoint2.at(i).pos.x ;
         JSONBezier["bezier"]["cp2"][i]["y"] = controlPoint2.at(i).pos.y ;
     }
+}
+//--------------------------------------------------------------
+void ofxBezierEditorSettings::savePoints(string filename){
     
+    savePointsJson();
     // Save JSON to a file
     ofSavePrettyJson(filename, JSONBezier);
     

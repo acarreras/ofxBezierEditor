@@ -14,11 +14,9 @@ ofxBezierDraw::ofxBezierDraw(ofxBezierEditorSettings& settings,
 : settings(settings), curveVertices(curveVertices), controlPoint1(controlPoint1), controlPoint2(controlPoint2) {
 
     
-    // Initialization
 }
 
 ofxBezierDraw::~ofxBezierDraw() {
-    // Cleanup
 }
 //--------------------------------------------------------------
 void ofxBezierDraw::draw(){
